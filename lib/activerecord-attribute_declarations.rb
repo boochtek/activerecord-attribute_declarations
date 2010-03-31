@@ -1,3 +1,7 @@
+# BUGS:
+#       Apparently, models get loaded twice sometimes, causing us to get duplicate declarations.
+#           Only solution is probably to make sure duplicate declarations are the same.
+
 # TODO:
 #       Write docs, including how to use it, and why I created it.
 #       Allow migration_code to take a hash, indicating renamed fields.
@@ -48,7 +52,8 @@ module ActiveRecord::AttributeDeclarations
 
   # Not sure if there's a better way to do this -- but it was easy enough to write my own.
   def self.load_all_models
-    Dir[File.join(Rails.root, 'app', 'models', '**', '*.rb')].each {|file| require File.basename(file) }
+    #Dir[File.join(Rails.root, 'app', 'models', '**', '*.rb')].each {|file| require File.basename(file, File.extname(file)) } # The Ruby way.
+    Dir[File.join(Rails.root, 'app', 'models', '**', '*.rb')].each {|file| load File.basename(file) } # The Rails way.
   end
 
 
@@ -75,7 +80,8 @@ module ActiveRecord::AttributeDeclarations
       name = name.to_sym
       type = type.to_sym
       if attribute_declarations.include?(name)
-        raise ActiveRecord::DuplicateAttributeDeclaration, "Duplicate declaration of attribute :#{name.to_s} in #{self.name} model."
+        #raise ActiveRecord::DuplicateAttributeDeclaration, "Duplicate declaration of attribute :#{name.to_s} in #{self.name} model."
+        puts "WARNING: Duplicate declaration of attribute :#{name.to_s} in #{self.name} model."
       end
       attribute_declarations[name] = options.merge(:type => type)
       add_validations_from_attribute_declaration(name)
@@ -104,7 +110,7 @@ module ActiveRecord::AttributeDeclarations
       return true if abstract_class?
 
       # If all the column names and attribute names are not the same, return false.
-      return false if column_names.sort != attribute_names_plus.sort
+      return false if column_names_minus.sort != attribute_names_plus.sort
 
       # If there are no added columns, removed columns, or changed columns, then we've got a match.
       return added_columns == [] && removed_columns == [] && changed_columns == []
@@ -144,9 +150,14 @@ module ActiveRecord::AttributeDeclarations
       result = attribute_declarations.keys.collect{|sym| sym.to_s}
     end
 
-    # Returns an array of strings of the keys included in attribute_declarations, plus belongs_to_names and the primary key.
+    # Returns an array of strings of the keys included in attribute_declarations, plus belongs_to_names.
     def attribute_names_plus
-      attribute_names + belongs_to_names << primary_key
+      attribute_names + belongs_to_names
+    end
+
+    # Returns an array of strings of the column names, minus the primary key.
+    def column_names_minus
+      column_names.reject{|name| name == primary_key}
     end
 
     # Returns an array of strings of the field names (including the _id suffix) of any belongs_to associations.
@@ -165,7 +176,7 @@ module ActiveRecord::AttributeDeclarations
 
     # Returns an array of strings, listing columns that are in the database schema, but not in the attribute declarations.
     def removed_columns
-      column_names.reject{|name| attribute_names_plus.include?(name)}
+      column_names_minus.reject{|name| attribute_names_plus.include?(name)}
     rescue ActiveRecord::StatementInvalid
       []
     end
