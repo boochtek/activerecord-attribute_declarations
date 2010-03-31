@@ -1,6 +1,6 @@
 # NOTE: Move this file directly into lib if/when we make this into a gem.
 
-require File.expand_path(File.dirname(__FILE__) + '/../../lib/activerecord_attribute_declarations')
+require File.expand_path(File.dirname(__FILE__) + '/../../lib/activerecord-attribute_declarations')
 ActiveRecord::AttributeDeclarations.load_all_models
 
 class MigrationsGenerator < Rails::Generator::Base
