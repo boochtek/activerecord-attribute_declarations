@@ -40,7 +40,7 @@ module ActiveRecord::AttributeDeclarations
   # These are all the options that can be provided in an 'attribute' declaration. They're divided up into where they are used.
   MIGRATION_OPTIONS = [:null, :default, :limit, :scale, :precision]
   ATTRIBUTE_OPTIONS = [:protected, :read_only, :serialize, :composed_of]
-  VALIDATION_OPTIONS = [:confirmation, :required, :acceptance_required, :length, :minimum_length, :maximum_length, :unique, :format, :within, :not_in, :minimum, :maximum]
+  VALIDATION_OPTIONS = [:confirmation, :required, :acceptance_required, :length, :min_length, :max_length, :unique, :format, :within, :not_in, :minimum, :maximum]
   DECLARATION_OPTIONS = ATTRIBUTE_OPTIONS + MIGRATION_OPTIONS + VALIDATION_OPTIONS
 
 
@@ -204,8 +204,8 @@ module ActiveRecord::AttributeDeclarations
       validates_confirmation_of name                                                if decl[:confirmation]
       validates_acceptance_of name                                                  if decl[:acceptance_required]
       validates_length_of name, :in => decl[:length]                                if decl[:length]
-      validates_length_of name, :minimum => decl[:minimum_length]                   if decl[:minimum_length]
-      validates_length_of name, :maximum => decl[:maximum_length]                   if decl[:maximum_length]
+      validates_length_of name, :minimum => decl[:min_length]                       if decl[:min_length]
+      validates_length_of name, :maximum => decl[:max_length]                       if decl[:max_length]
       validates_format_of name, :with => decl[:format]                              if decl[:format]
       validates_inclusion_of name, :in => decl[:within]                             if decl[:within]
       validates_exclusion_of name, :in => decl[:not_in]                             if decl[:not_in]
