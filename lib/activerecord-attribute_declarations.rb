@@ -1,7 +1,3 @@
-# BUGS:
-#       Apparently, models get loaded twice sometimes, causing us to get duplicate declarations.
-#           Only solution is probably to make sure duplicate declarations are the same.
-
 # TODO:
 #       Write docs, including how to use it, and why I created it.
 #       Allow migration_code to take a hash, indicating renamed fields.
