@@ -53,7 +53,8 @@ module ActiveRecord::AttributeDeclarations
   # Not sure if there's a better way to do this -- but it was easy enough to write my own.
   def self.load_all_models
     #Dir[File.join(Rails.root, 'app', 'models', '**', '*.rb')].each {|file| require File.basename(file, File.extname(file)) } # The Ruby way.
-    Dir[File.join(Rails.root, 'app', 'models', '**', '*.rb')].each {|file| load File.basename(file) } # The Rails way.
+    #Dir[File.join(Rails.root, 'app', 'models', '**', '*.rb')].each {|file| load File.basename(file) } # The Rails way.
+    Dir[File.join(Rails.root, 'app', 'models', '**', '*.rb')].each {|file| File.basename(file, File.extname(file)).camelize.constantize } # The Rails autoload way (prevents double-loading).
   end
 
 
